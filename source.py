@@ -12,7 +12,7 @@ import glcontext
 
 pygame.mixer.init()
 s = 'Audio'
-hp = 100
+hp = 100.0
 kill_line1 = pygame.mixer.Sound(os.path.join(s, 'kill_line1.mp3'))
 kill_line2 = pygame.mixer.Sound(os.path.join(s, 'kill_line2.mp3'))
 death_sound = pygame.mixer.Sound(os.path.join(s, 'death_noises.mp3'))
@@ -102,6 +102,7 @@ class Turret(pygame.sprite.Sprite):
             self.image = pygame.image.load("Frame18.png")
 
 
+
 # Initializing pygame and some global variables.
 pygame.init()
 pygame.mixer.init()
@@ -122,6 +123,7 @@ color_light = (170, 170, 170)
 color_dark = (100, 100, 100)
 color = (255, 255, 255)
 smallfont = pygame.font.SysFont('Corbel', 35)
+largefont = pygame.font.SysFont('Corbel', 55)
 slide = pygame.mixer.Sound(os.path.join(s, 'slide.mp3'))
 shot = pygame.mixer.Sound(os.path.join(s, 'shot.mp3'))
 slide_sound = False
@@ -129,11 +131,18 @@ slide_channel = pygame.mixer.Channel(1)
 pygame.mixer.set_num_channels(100)
 j = True
 spawnrate = 800
-hp = 100
+hp = 100.0
+HP_SYMBOL = pygame.image.load("HP.png")
 
 # initializes the pygame screen
 screen = pygame.Surface(RES).convert((255, 65280, 16711680, 0))
 pygame.display.set_mode(RES, DOUBLEBUF | OPENGL)
+
+# Function for displaying hp image and hp text.
+def displayhp(hp):
+    hp_text = largefont.render(str(round(hp, 1)), True, color)
+    screen.blit(HP_SYMBOL, (150, 750))
+    screen.blit(hp_text, (280, 775))
 
 # Creates openGL context and convewrts pygame coordinates to openGL coordinates.
 ctx = moderngl.create_context()
@@ -227,7 +236,7 @@ crosshair_group = pygame.sprite.Group()
 crosshair_group.add(crosshair)
 
 i = 0
-runing = True
+running = True
 slide_channel.play(slide, -1)
 slide_channel.pause()
 start_menu = True
@@ -235,8 +244,7 @@ frame = 0
 shooting = False
 start_time = time.time()
 # MAIN LOOP
-while runing:
-    print(hp)
+while running:
 
     # Death, reinitializes variables --- there is definitely a cleaner and less stupid way to do this
     # TODO MAKE REINITIALIZATION CLEANER
@@ -272,7 +280,7 @@ while runing:
         crosshair_group.add(crosshair)
 
         i = 0
-        runing = True
+        running = True
         slide_channel.play(slide, -1)
         slide_channel.pause()
         start_menu = True
@@ -342,7 +350,7 @@ while runing:
     crosshair_group.update()
     TURRET_GROUP.draw(screen)
     crosshair_group.draw(screen)
-    
+
     # Allows for the screen to scroll seamlessly in both directions.
     if slide_sound == True:
         slide_channel.unpause()
@@ -382,7 +390,7 @@ while runing:
 
     for event in pygame.event.get():
         if event.type == QUIT:
-            runing = False
+            running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 pygame.mixer.find_channel().play(shot)
@@ -442,6 +450,7 @@ while runing:
                     render()
 
     frame += 1
+    displayhp(hp)
     render()
     clock.tick(FPS)
 pygame.quit()
